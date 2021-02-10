@@ -1,5 +1,9 @@
 # import the necessary packages
 from sklearn.linear_model import LogisticRegression
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.svm import LinearSVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
 from sklearn.metrics import classification_report
 from pyimagesearch import config
 import numpy as np
@@ -51,7 +55,14 @@ le = pickle.loads(open(config.LE_PATH, "rb").read())
 
 # train the model
 print("[INFO] training model...")
+# LR
 model = LogisticRegression(solver="lbfgs", multi_class="auto")
+model.fit(trainX, trainY)
+# LDA
+model = LinearDiscriminantAnalysis()
+model.fit(trainX, trainY)
+# SVM
+model = make_pipeline(StandardScaler(), LinearSVC(random_state=0, tol=1e-5))
 model.fit(trainX, trainY)
  
 # evaluate the model
@@ -61,6 +72,7 @@ val = model.predict(valX)
 
 
 print(classification_report(testY, preds, target_names=le.classes_))
+print(classification_report(valY, val, target_names=le.classes_))
 
 # serialize the model to disk
 print("[INFO] saving model...")
