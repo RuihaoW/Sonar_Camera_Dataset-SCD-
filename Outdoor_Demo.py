@@ -12,18 +12,21 @@ from scipy.signal import butter, lfilter
 import matplotlib.pyplot as plt
 from matplotlib.pyplot import figure, plot, show, draw, pause, subplot, xlabel, ylabel, title
 import matplotlib.image as img
+import matplotlib.patches as pat
 from pathlib import Path
 from operator import itemgetter
+import cv2
 
 
 # Go to dir
-s = 'Outdoor_4_b'
+s = 'Outdoor_9_a'
 path_echo = "D:\\RW\\Sonar_Echo\\Raw_Data\\Outdoor\\Echo\\%s\\" % s
 path_image = "D:\\RW\\Sonar_Echo\\Raw_Data\\Outdoor\\Image\\%s\\" % s
 os.chdir(path_echo)
-# bandpass filter
+# bandpass filter parameter
 lowcut = 15e3
 highcut = 150e3
+# sigal parameter (fs: sampling frequency, n_sample: number of sample)
 fs = 400e3
 n_sample = 10000
 time = np.linspace(0,1000*(n_sample/fs),n_sample)
@@ -32,6 +35,7 @@ distance = time * 340 / 2 *(1/1000)
 """
 Define all function
 """
+# sort the echo files by time
 def sort_echo_path(path_echo):
     path = []
     path = [i for i in os.listdir(path_echo) if '.txt' in i]
@@ -39,7 +43,8 @@ def sort_echo_path(path_echo):
     sort_idx = sorted(range(len(num)), key=lambda k: num[k])
     sort_path = [path[i] for i in sort_idx]
     return sort_path
-                        
+
+# plot echo with time/distance as x-axis, just for observation.
 def echo_plt(data,time,distance,i):
     fig = plt.figure()
     f,(ax1,ax2) = plt.subplots(2,1,sharey=True)
@@ -62,6 +67,7 @@ def echo_plt(data,time,distance,i):
     plt.show()
     # f.savefig("%d_echo.png" % i)
     
+# plot spectrogram, really ugly figure
 def spectrogram(x,fs,nfft,overlap,i):
     fig = plt.figure()
     ax3 = subplot(2,1,1)           
@@ -76,7 +82,8 @@ def spectrogram(x,fs,nfft,overlap,i):
     # plt.tight_layout()
     plt.show()
     # fig.savefig("%d_spectrogram.png" % i)
-    
+
+# bandpass filter
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
     low = lowcut / nyq
@@ -89,6 +96,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order):
     y = lfilter(b, a, data)
     return y
 
+# read txt file from folder, then bandpass, then normalize, then remove DC shift
 def read_data(file):
     A = np.loadtxt(file)
     if len(A) == 20000:
@@ -101,7 +109,8 @@ def read_data(file):
     else:
         aveecho = np.zeros((2,10000))
     return aveecho
-    
+
+# save echo into numpy array
 def prep_echo(echo):
     count = len(echo)
     data = np.ndarray((count,2,10000), dtype=np.float)
@@ -134,14 +143,24 @@ if __name__ == '__main__':
     main()
     
     
-# for i in range(0,2047,50):
-#     resized = cv2.resize(image[i],(600,300),interpolation = cv2.INTER_AREA)
+# for i in range(0,3634,200):
+#     resized = cv2.resize(image[i,200:,:],(1200,600),interpolation = cv2.INTER_AREA)
 #     fig = plt.figure()
-#     plt.imshow(resized[50:250,100:500])
-#     plt.axis('off')
+#     ax = fig.add_subplot(111) 
+#     plt.imshow(np.fliplr(resized),cmap='gray',vmin=0,vmax=255)
+#     cir1 = pat.Circle((600,250),333/2,fc='none',ec='r',ls='-')
+#     cir2 = pat.Circle((600,250),170/2,fc='none',ec='r',ls='-.')
+#     cir3 = pat.Circle((600,250),117/2,fc='none',ec='r',ls=':')
+#     ax.add_patch(cir1)
+#     ax.add_patch(cir2)
+#     ax.add_patch(cir3)
+#     # plt.axis('off')
 #     plt.autoscale(tight=True)
-#     fig.savefig('%d_camera.png' % i)
-#     plt.close()
+#     plt.show()
+#     echo_plt(echo[i,:,:], time, distance,i)
+#     spectrogram(echo[i,:,:],fs/1e3,256,200,i)
+#     # fig.savefig('%d_camera.png' % i)
+#     # plt.close()
 
 # num = 100
 # input = filted[num]
