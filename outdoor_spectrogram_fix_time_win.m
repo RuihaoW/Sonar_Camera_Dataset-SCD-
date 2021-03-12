@@ -16,7 +16,7 @@ if ~exist('spectrogram_image_right', 'dir')
    mkdir('spectrogram_image_right')
 end 
 %%
-for i = 1:10
+for i = 3:3
 cd('D:\RW\Sonar_Echo\Raw_Data\Outdoor\echo_result_02_23_2021\echo_result_02_23_2021');
 echoname = ['filted_echo_Outdoor_',dataset_name{i},'.npy'];
 labelname = ['predict_result_',dataset_name{i},'.npy'];
@@ -47,30 +47,32 @@ for j = 1:p
     % Normalize
     echo_part = echo_left(j,start_point:end_point);
     echo_part = (echo_part - min(echo_part))/(max(echo_part) - min(echo_part));
-    % draw spectrogram 
-    fig = figure('visible', 'off');
-    axes('Units', 'normalized', 'Position', [0 0 1 1]);
-    spectrogram(echo_part,320,222,320,fs,'yaxis');
-    ylim([20 100]);
-    caxis([-120 -50]);
-    ax = gca;
-    ax.Visible = 'off';
-    colorbar('off');
-    % get label to name the image
-    if le(j) == 1
-        label = 'foliage';
-    elseif le(j) == 0
-        label = 'gap';
-    else
+    if ~isnan(mean(echo_part))
+        % draw spectrogram 
+        fig = figure('visible', 'off');
+        axes('Units', 'normalized', 'Position', [0 0 1 1]);
+        spectrogram(echo_part,320,222,320,fs,'yaxis');
+        ylim([20 100]);
+        caxis([-120 -50]);
+        ax = gca;
+        ax.Visible = 'off';
+        colorbar('off');
+        % get label to name the image
+        if le(j) == 1
+            label = 'foliage';
+        elseif le(j) == 0
+            label = 'gap';
+        else
+            disp(dataset_name{i});
+            disp(j);
+            disp('Wrong label! Neither foliage (1) or gap (0). Please check');
+        end
+        imgname = sprintf('%s_%s_%d.jpg',label,dataset_name{i},j);
+        saveas(fig,imgname);
+        close(fig);
         disp(dataset_name{i});
         disp(j);
-        disp('Wrong label! Neither foliage (1) or gap (0). Please check');
     end
-    imgname = sprintf('%s_%s_%d.jpg',label,dataset_name{i},j);
-    saveas(fig,imgname);
-    close(fig);
-    disp(dataset_name{i});
-    disp(j);
 end
 cd('..')
 cd('spectrogram_image_right')
@@ -84,28 +86,30 @@ for j = 1:p
     echo_part = echo_right(j,start_point:end_point);
     echo_part = (echo_part - min(echo_part))/(max(echo_part) - min(echo_part));
     % draw spectrogram 
-    fig = figure('visible', 'off');
-    axes('Units', 'normalized', 'Position', [0 0 1 1]);
-    spectrogram(echo_part,320,222,320,fs,'yaxis');
-    ylim([20 100]);
-    caxis([-120 -50]);
-    ax = gca;
-    ax.Visible = 'off';
-    colorbar('off');
-    % get label to name the image
-    if le(j) == 1
-        label = 'foliage';
-    elseif le(j) == 0
-        label = 'gap';
-    else
+    if ~isnan(mean(echo_part))
+        fig = figure('visible', 'off');
+        axes('Units', 'normalized', 'Position', [0 0 1 1]);
+        spectrogram(echo_part,320,222,320,fs,'yaxis');
+        ylim([20 100]);
+        caxis([-120 -50]);
+        ax = gca;
+        ax.Visible = 'off';
+        colorbar('off');
+        % get label to name the image
+        if le(j) == 1
+            label = 'foliage';
+        elseif le(j) == 0
+            label = 'gap';
+        else
+            disp(dataset_name{i});
+            disp(j);
+            disp('Wrong label! Neither foliage (1) or gap (0). Please check');
+        end
+        imgname = sprintf('%s_%s_%d.jpg',label,dataset_name{i},j);
+        saveas(fig,imgname);
+        close(fig);
         disp(dataset_name{i});
         disp(j);
-        disp('Wrong label! Neither foliage (1) or gap (0). Please check');
     end
-    imgname = sprintf('%s_%s_%d.jpg',label,dataset_name{i},j);
-    saveas(fig,imgname);
-    close(fig);
-    disp(dataset_name{i});
-    disp(j);
 end
 end
