@@ -16,7 +16,7 @@ if ~exist('spectrogram_image_right', 'dir')
    mkdir('spectrogram_image_right')
 end 
 %%
-for i = 1:1
+for i = 1:10
 cd('D:\RW\Sonar_Echo\Raw_Data\Outdoor\echo_result_02_23_2021\echo_result_02_23_2021');
 echoname = ['filted_echo_Outdoor_',dataset_name{i},'.npy'];
 labelname = ['predict_result_',dataset_name{i},'.npy'];
@@ -40,8 +40,10 @@ compare = @(a,b) min(a,b);
 cd('spectrogram_image_left')
 for j = 1:p
     % get start point and end point
-    start_point = l_idx(j,1)-marg;
-    end_point = compare(l_idx(j,1)+win_len+marg, n-250); % 250 here is to avoid empty blank in right side of spectrogram.
+    if ~isnan(l_idx(j,1))
+        start_point = l_idx(j,1)-marg;
+        end_point = compare(l_idx(j,1)+win_len+marg, n-250); % 250 here is to avoid empty blank in right side of spectrogram.
+    end
     % Normalize
     echo_part = echo_left(j,start_point:end_point);
     echo_part = (echo_part - min(echo_part))/(max(echo_part) - min(echo_part));
@@ -74,8 +76,10 @@ cd('..')
 cd('spectrogram_image_right')
 for j = 1:p
     % get start point and end point
-    start_point = r_idx(j,1)-marg;
-    end_point = compare(r_idx(j,1)+win_len+marg, n-250); % 250 here is to avoid empty blank in right side of spectrogram.
+    if ~isnan(r_idx(j,1))
+        start_point = r_idx(j,1)-marg;
+        end_point = compare(r_idx(j,1)+win_len+marg, n-250); % 250 here is to avoid empty blank in right side of spectrogram.
+    end
     % Normalize
     echo_part = echo_right(j,start_point:end_point);
     echo_part = (echo_part - min(echo_part))/(max(echo_part) - min(echo_part));
