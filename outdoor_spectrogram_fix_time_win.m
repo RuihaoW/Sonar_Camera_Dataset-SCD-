@@ -68,7 +68,7 @@ for j = 1:p
 %             disp('Wrong label! Neither foliage (1) or gap (0). Please check');
 %             break;
 %         end
-        imgname = sprintf('%s_%s_%d.jpg',le(j),dataset_name{i},j);
+        imgname = sprintf('%d_%s_%d.jpg',le(j),dataset_name{i},j);
         saveas(fig,imgname);
         close(fig);
         disp(dataset_name{i});
